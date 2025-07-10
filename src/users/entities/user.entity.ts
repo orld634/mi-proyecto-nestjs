@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Venta } from '../../venta/entities/venta.entity';
 
 @Entity('users')
 export class User {
@@ -30,4 +31,8 @@ export class User {
 
   @UpdateDateColumn()
   fechaActualizacion: Date;
+
+  // Relación con Ventas (Un usuario puede tener muchas ventas)
+  @OneToMany(() => Venta, (venta) => venta.usuario)
+  ventas: Venta[];
 }

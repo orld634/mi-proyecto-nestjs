@@ -6,6 +6,9 @@ import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ProveedoresModule } from './proveedores/proveedores.module';
+import { ProductosModule } from './productos/productos.module'; 
+import { VentaModule } from './venta/venta.module';
+import { DetalleVentaModule } from './detalle-venta/detalle-venta.module';
 
 @Module({
   imports: [
@@ -20,7 +23,7 @@ import { ProveedoresModule } from './proveedores/proveedores.module';
         port: 3306,
         username: configService.get<string>('DB_USERNAME') || 'root',
         password: configService.get<string>('DB_PASSWORD') || 'root',
-        database: configService.get<string>('DB_DATABASE') || 'brazzinos',
+        database: configService.get<string>('DB_DATABASE') || 'brazzino',
         autoLoadEntities: true,
         synchronize: true, // Solo en desarrollo
         connectTimeout: 60000,
@@ -33,6 +36,9 @@ import { ProveedoresModule } from './proveedores/proveedores.module';
     AuthModule,
     UsersModule,
     ProveedoresModule,
+    ProductosModule,
+    VentaModule,
+    DetalleVentaModule
   ],
   controllers: [],
   providers: [

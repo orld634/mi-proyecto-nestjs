@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength, Length, IsOptional } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, Length, IsOptional, IsEnum } from 'class-validator';
+
+// Enum para los roles
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  MODERATOR = 'moderator'
+}
 
 export class RegisterDto {
   @IsEmail({}, { message: 'Debe ser un email válido' })
@@ -21,6 +28,6 @@ export class RegisterDto {
   password: string;
 
   @IsOptional()
-  @IsString({ message: 'El rol debe ser una cadena de texto' })
-  role?: string;
+  @IsEnum(UserRole, { message: 'El rol debe ser uno de los valores permitidos: admin, user, moderator' })
+  role?: UserRole;
 }
