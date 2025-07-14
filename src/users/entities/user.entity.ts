@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Venta } from '../../venta/entities/venta.entity';
+import { Compra } from '../../compra/entities/compra.entity';
 
 @Entity('users')
 export class User {
@@ -35,4 +36,8 @@ export class User {
   // Relación con Ventas (Un usuario puede tener muchas ventas)
   @OneToMany(() => Venta, (venta) => venta.usuario)
   ventas: Venta[];
+
+  // Relación con Compras (Un admin puede tener muchas compras)
+  @OneToMany(() => Compra, (compra) => compra.usuario)
+  compras: Compra[];
 }

@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { DetalleVenta } from '../../detalle-venta/entities/detalle-venta.entity';
+import { DetalleCompra } from '../../detalle-compra/entities/detalle-compra.entity';
 
 @Entity('productos')
 export class Producto {
@@ -37,6 +39,20 @@ export class Producto {
 
   @Column()
   id_categoria: number;
+
+  // Relación con DetalleVenta (Un producto puede aparecer en múltiples detalles de venta)
+  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.producto, {
+    cascade: false,
+    eager: false
+  })
+  detalleVentas: DetalleVenta[];
+
+  // Relación con DetalleCompra (Un producto puede aparecer en múltiples detalles de compra)
+  @OneToMany(() => DetalleCompra, (detalleCompra) => detalleCompra.producto, {
+    cascade: false,
+    eager: false
+  })
+  detalleCompras: DetalleCompra[];
 
   // Si tienes una entidad Categoria, puedes agregar la relación:
   // @ManyToOne(() => Categoria)

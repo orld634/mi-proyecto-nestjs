@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { DetalleVenta } from '../../detalle-venta/entities/detalle-venta.entity';
 
 export enum EstadoVenta {
   COMPLETADA = 'completada',
@@ -46,4 +47,11 @@ export class Venta {
   @ManyToOne(() => User, (user) => user.ventas)
   @JoinColumn({ name: 'id_usuario' })
   usuario: User;
+
+  // Relación con DetalleVenta (Una venta puede tener múltiples detalles)
+  @OneToMany(() => DetalleVenta, (detalleVenta) => detalleVenta.venta, {
+    cascade: true,
+    eager: false
+  })
+  detalles: DetalleVenta[];
 }

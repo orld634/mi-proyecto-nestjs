@@ -9,6 +9,8 @@ import { ProveedoresModule } from './proveedores/proveedores.module';
 import { ProductosModule } from './productos/productos.module'; 
 import { VentaModule } from './venta/venta.module';
 import { DetalleVentaModule } from './detalle-venta/detalle-venta.module';
+import { CompraModule } from './compra/compra.module';
+import { DetalleCompraModule } from './detalle-compra/detalle-compra.module';
 
 @Module({
   imports: [
@@ -38,7 +40,9 @@ import { DetalleVentaModule } from './detalle-venta/detalle-venta.module';
     ProveedoresModule,
     ProductosModule,
     VentaModule,
-    DetalleVentaModule
+    DetalleVentaModule,
+    CompraModule,
+    DetalleCompraModule
   ],
   controllers: [],
   providers: [

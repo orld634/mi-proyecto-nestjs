@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Compra } from '../../compra/entities/compra.entity';
 
 @Entity('proveedores')
 export class Proveedor {
@@ -28,4 +29,8 @@ export class Proveedor {
 
   @Column({ length: 20, unique: true })
   ruc_nit: string;
+
+  // Relación con Compras (Un proveedor puede tener muchas compras)
+  @OneToMany(() => Compra, (compra) => compra.proveedor)
+  compras: Compra[];
 }
