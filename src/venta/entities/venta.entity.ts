@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { DetalleVenta } from '../../detalle-venta/entities/detalle-venta.entity';
+import { DevolucionVenta } from '../../devolucion-venta/entities/devolucion-venta.entity';
 
 export enum EstadoVenta {
   COMPLETADA = 'completada',
@@ -54,4 +55,8 @@ export class Venta {
     eager: false
   })
   detalles: DetalleVenta[];
+
+  // Relación con DevolucionVenta (Una venta puede tener múltiples devoluciones)
+  @OneToMany(() => DevolucionVenta, (devolucion) => devolucion.venta)
+  devoluciones: DevolucionVenta[];
 }

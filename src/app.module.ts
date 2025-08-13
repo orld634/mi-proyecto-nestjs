@@ -11,6 +11,15 @@ import { VentaModule } from './venta/venta.module';
 import { DetalleVentaModule } from './detalle-venta/detalle-venta.module';
 import { CompraModule } from './compra/compra.module';
 import { DetalleCompraModule } from './detalle-compra/detalle-compra.module';
+import { CarritoCompraModule } from './carrito-compra/carrito-compra.module';
+import { DetalleCarritoModule } from './detalle-carrito/detalle-carrito.module';
+import { InventarioMovimientoModule } from './inventario-movimiento/inventario-movimiento.module';
+import { DevolucionVentaModule } from './devolucion-venta/devolucion-venta.module';
+import { DetalleDevolucionVentaModule } from './detalle-devolucion-venta/detalle-devolucion-venta.module';
+import { DevolucionCompraModule } from './devolucion-compra/devolucion-compra.module';
+import { DetalleDevolucionCompraModule } from './detalle-devolucion-compra/detalle-devolucion-compra.module';
+import { CategoriaModule } from './categoria/categoria.module';
+
 
 @Module({
   imports: [
@@ -24,7 +33,7 @@ import { DetalleCompraModule } from './detalle-compra/detalle-compra.module';
         host: configService.get<string>('DB_HOST') || 'localhost',
         port: 3306,
         username: configService.get<string>('DB_USERNAME') || 'root',
-        password: configService.get<string>('DB_PASSWORD') || 'root',
+        password: configService.get<string>('DB_PASSWORD') || '',
         database: configService.get<string>('DB_DATABASE') || 'brazzino',
         autoLoadEntities: true,
         synchronize: true, // Solo en desarrollo
@@ -42,7 +51,16 @@ import { DetalleCompraModule } from './detalle-compra/detalle-compra.module';
     VentaModule,
     DetalleVentaModule,
     CompraModule,
-    DetalleCompraModule
+    DetalleCompraModule,
+    CarritoCompraModule,
+    DetalleCarritoModule,
+    InventarioMovimientoModule,
+    DevolucionVentaModule,
+    DetalleDevolucionVentaModule,
+    DevolucionCompraModule,
+    DetalleDevolucionCompraModule,
+    CategoriaModule
+    
   ],
   controllers: [],
   providers: [

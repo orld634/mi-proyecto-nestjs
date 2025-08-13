@@ -1,5 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany
+} from 'typeorm';
 import { Compra } from '../../compra/entities/compra.entity';
+import { DevolucionCompra } from '../../devolucion-compra/entities/devolucion-compra.entity';
 
 @Entity('proveedores')
 export class Proveedor {
@@ -9,28 +17,36 @@ export class Proveedor {
   @Column({ length: 100 })
   nombre_empresa: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   contacto: string;
 
-  @Column({ length: 20 })
+  @Column({ length: 20, nullable: true })
   telefono: string;
 
-  @Column({ length: 100, unique: true })
+  @Column({ length: 100, nullable: true })
   email: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   direccion: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 100, nullable: true })
   pais: string;
 
-  @Column({ type: 'boolean', default: true })
-  activo: boolean;
-
-  @Column({ length: 20, unique: true })
+  @Column({ length: 20, nullable: true })
   ruc_nit: string;
 
-  // Relación con Compras (Un proveedor puede tener muchas compras)
+  @Column({ default: true })
+  activo: boolean;
+
+  @CreateDateColumn()
+  fechaCreacion: Date;
+
+  @UpdateDateColumn()
+  fechaActualizacion: Date;
+
   @OneToMany(() => Compra, (compra) => compra.proveedor)
   compras: Compra[];
+
+  @OneToMany(() => DevolucionCompra, (devolucionCompra) => devolucionCompra.proveedor)
+  devolucionesCompra: DevolucionCompra[];
 }

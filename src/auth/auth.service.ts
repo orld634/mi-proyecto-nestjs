@@ -39,6 +39,8 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
+
+  
     // Buscar usuario por email
     const user = await this.usersService.findByEmail(loginDto.email);
     

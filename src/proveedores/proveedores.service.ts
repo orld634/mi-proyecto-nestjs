@@ -37,13 +37,13 @@ export class ProveedoresService {
     });
   }
 
-  async findOne(id: number): Promise<Proveedor> {
+  async findOne(id_proveedor: number): Promise<Proveedor> {
     const proveedor = await this.proveedorRepository.findOne({
-      where: { id_proveedor: id, activo: true }
+      where: { id_proveedor, activo: true }
     });
     
     if (!proveedor) {
-      throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+      throw new NotFoundException(`Proveedor con ID ${id_proveedor} no encontrado`);
     }
     
     return proveedor;
@@ -80,6 +80,7 @@ export class ProveedoresService {
     });
   }
 
+  // Método original mantenido para compatibilidad
   async searchByNombre(nombre: string): Promise<Proveedor[]> {
     return await this.proveedorRepository.find({
       where: { 
@@ -90,8 +91,41 @@ export class ProveedoresService {
     });
   }
 
-  async update(id: number, updateProveedorDto: UpdateProveedorDto): Promise<Proveedor> {
-    const proveedor = await this.findOne(id);
+  // Nuevo método más específico
+  async searchByNombreEmpresa(nombre_empresa: string): Promise<Proveedor[]> {
+    return await this.proveedorRepository.find({
+      where: { 
+        nombre_empresa: Like(`%${nombre_empresa}%`), 
+        activo: true 
+      },
+      order: { nombre_empresa: 'ASC' }
+    });
+  }
+
+  async findByContacto(contacto: string): Promise<Proveedor[]> {
+    return await this.proveedorRepository.find({
+      where: { 
+        contacto: Like(`%${contacto}%`), 
+        activo: true 
+      },
+      order: { nombre_empresa: 'ASC' }
+    });
+  }
+
+  async findByTelefono(telefono: string): Promise<Proveedor> {
+    const proveedor = await this.proveedorRepository.findOne({
+      where: { telefono, activo: true }
+    });
+    
+    if (!proveedor) {
+      throw new NotFoundException(`Proveedor con teléfono ${telefono} no encontrado`);
+    }
+    
+    return proveedor;
+  }
+
+  async update(id_proveedor: number, updateProveedorDto: UpdateProveedorDto): Promise<Proveedor> {
+    const proveedor = await this.findOne(id_proveedor);
     
     try {
       Object.assign(proveedor, updateProveedorDto);
@@ -110,29 +144,35 @@ export class ProveedoresService {
     }
   }
 
-  async remove(id: number): Promise<void> {
-    const proveedor = await this.findOne(id);
+  async remove(id_proveedor: number): Promise<void> {
+    const proveedor = await this.findOne(id_proveedor);
     proveedor.activo = false;
     await this.proveedorRepository.save(proveedor);
   }
 
-  async hardDelete(id: number): Promise<void> {
-    const resultado = await this.proveedorRepository.delete(id);
+  async hardDelete(id_proveedor: number): Promise<void> {
+    const resultado = await this.proveedorRepository.delete(id_proveedor);
     if (resultado.affected === 0) {
-      throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+      throw new NotFoundException(`Proveedor con ID ${id_proveedor} no encontrado`);
     }
   }
 
-  async activate(id: number): Promise<Proveedor> {
+  async activate(id_proveedor: number): Promise<Proveedor> {
     const proveedor = await this.proveedorRepository.findOne({
-      where: { id_proveedor: id }
+      where: { id_proveedor }
     });
     
     if (!proveedor) {
-      throw new NotFoundException(`Proveedor con ID ${id} no encontrado`);
+      throw new NotFoundException(`Proveedor con ID ${id_proveedor} no encontrado`);
     }
     
     proveedor.activo = true;
+    return await this.proveedorRepository.save(proveedor);
+  }
+
+  async deactivate(id_proveedor: number): Promise<Proveedor> {
+    const proveedor = await this.findOne(id_proveedor);
+    proveedor.activo = false;
     return await this.proveedorRepository.save(proveedor);
   }
 }

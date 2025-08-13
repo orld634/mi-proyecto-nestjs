@@ -1,11 +1,11 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
-  Delete, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
   ParseIntPipe,
   Query
 } from '@nestjs/common';
@@ -28,8 +28,8 @@ export class ProveedoresController {
   }
 
   @Get('search')
-  searchByNombre(@Query('nombre') nombre: string) {
-    return this.proveedoresService.searchByNombre(nombre);
+  searchByNombreEmpresa(@Query('nombre_empresa') nombre_empresa: string) {
+    return this.proveedoresService.searchByNombreEmpresa(nombre_empresa);
   }
 
   @Get('pais/:pais')
@@ -47,31 +47,46 @@ export class ProveedoresController {
     return this.proveedoresService.findByRucNit(rucNit);
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.proveedoresService.findOne(id);
+  @Get('contacto/:contacto')
+  findByContacto(@Param('contacto') contacto: string) {
+    return this.proveedoresService.findByContacto(contacto);
   }
 
-  @Patch(':id')
+  @Get('telefono/:telefono')
+  findByTelefono(@Param('telefono') telefono: string) {
+    return this.proveedoresService.findByTelefono(telefono);
+  }
+
+  @Get(':id_proveedor')
+  findOne(@Param('id_proveedor', ParseIntPipe) id_proveedor: number) {
+    return this.proveedoresService.findOne(id_proveedor);
+  }
+
+  @Patch(':id_proveedor')
   update(
-    @Param('id', ParseIntPipe) id: number, 
+    @Param('id_proveedor', ParseIntPipe) id_proveedor: number, 
     @Body() updateProveedorDto: UpdateProveedorDto
   ) {
-    return this.proveedoresService.update(id, updateProveedorDto);
+    return this.proveedoresService.update(id_proveedor, updateProveedorDto);
   }
 
-  @Patch(':id/activate')
-  activate(@Param('id', ParseIntPipe) id: number) {
-    return this.proveedoresService.activate(id);
+  @Patch(':id_proveedor/activate')
+  activate(@Param('id_proveedor', ParseIntPipe) id_proveedor: number) {
+    return this.proveedoresService.activate(id_proveedor);
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.proveedoresService.remove(id);
+  @Patch(':id_proveedor/deactivate')
+  deactivate(@Param('id_proveedor', ParseIntPipe) id_proveedor: number) {
+    return this.proveedoresService.deactivate(id_proveedor);
   }
 
-  @Delete(':id/hard')
-  hardDelete(@Param('id', ParseIntPipe) id: number) {
-    return this.proveedoresService.hardDelete(id);
+  @Delete(':id_proveedor')
+  remove(@Param('id_proveedor', ParseIntPipe) id_proveedor: number) {
+    return this.proveedoresService.remove(id_proveedor);
+  }
+
+  @Delete(':id_proveedor/hard')
+  hardDelete(@Param('id_proveedor', ParseIntPipe) id_proveedor: number) {
+    return this.proveedoresService.hardDelete(id_proveedor);
   }
 }
