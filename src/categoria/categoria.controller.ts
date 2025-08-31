@@ -16,7 +16,7 @@ import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 export class CategoriaController {
   constructor(private readonly categoriaService: CategoriaService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() createCategoriaDto: CreateCategoriaDto) {
     return this.categoriaService.create(createCategoriaDto);
   }

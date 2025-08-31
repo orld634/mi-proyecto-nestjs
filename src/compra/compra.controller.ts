@@ -2,18 +2,18 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Re
 import { CompraService } from './compra.service';
 import { CreateCompraDto } from './dto/create-compra.dto';
 import { UpdateCompraDto } from './dto/update-compra.dto';
-//import { JwtAuthGuard } from '../auth/jwt-auth.guar';  //Descomenta si usas JWT
-// import { RolesGuard } from '../auth/roles.guard'; // Descomenta si usas guards de roles
-// import { Roles } from '../auth/roles.decorator'; // Descomenta si usas decorador de roles
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';  
+ import { RolesGuard } from '../auth/guards/roles.guard';
+ import { Roles } from '../auth/decorators/roles.decorator'; 
 
 @Controller('compras')
-// @UseGuards(JwtAuthGuard) // Descomenta para proteger todas las rutas
+ @UseGuards(JwtAuthGuard) 
 export class CompraController {
   constructor(private readonly compraService: CompraService) {}
 
-  @Post()
-  // @UseGuards(RolesGuard)
-  // @Roles('admin')
+  @Post('create')
+   @UseGuards(RolesGuard)
+   @Roles('admin')
   create(@Body() createCompraDto: CreateCompraDto, @Request() req) {
     // Obtener el userId del token JWT o del request
     const userId = req.user?.id || 1; // Temporal: usar 1 como fallback

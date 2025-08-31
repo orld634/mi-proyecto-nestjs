@@ -12,7 +12,7 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
     transform: true
   }));
-  
+  app.enableCors();
   await app.listen(8222);
   console.log('Aplicación corriendo en http://localhost:8222');
 }

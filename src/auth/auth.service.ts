@@ -45,7 +45,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(loginDto.email);
     
     if (!user) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Credenciales inválidas desde servidor');
     }
 
     // Verificar si el usuario está activo

@@ -33,7 +33,7 @@ import { CategoriaModule } from './categoria/categoria.module';
         host: configService.get<string>('DB_HOST') || 'localhost',
         port: 3306,
         username: configService.get<string>('DB_USERNAME') || 'root',
-        password: configService.get<string>('DB_PASSWORD') || '',
+        password: configService.get<string>('DB_PASSWORD') || 'root',
         database: configService.get<string>('DB_DATABASE') || 'brazzino',
         autoLoadEntities: true,
         synchronize: true, // Solo en desarrollo
