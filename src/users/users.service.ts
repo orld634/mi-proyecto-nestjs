@@ -1,6 +1,6 @@
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository , LessThan } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 
@@ -12,7 +12,7 @@ export class UsersService {
   ) {}
 
   async create(userData: {
-    email: string;  
+    email: string;
     nombre: string;
     apellido: string;
     password: string;
@@ -23,8 +23,6 @@ export class UsersService {
       where: { email: userData.email },
     });
 
-    
-    
     if (existingUser) {
       throw new ConflictException('Ya existe un usuario con este email');
     }
@@ -33,7 +31,6 @@ export class UsersService {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
 
-   
     // Crear el usuario
     const user = this.userRepository.create({
       ...userData,
@@ -41,10 +38,7 @@ export class UsersService {
       role: userData.role || 'user',
     });
 
-   
     return await this.userRepository.save(user);
-
-
   }
 
   async findByEmail(email: string) {
@@ -74,5 +68,69 @@ export class UsersService {
       select: ['id', 'email', 'nombre', 'apellido', 'role', 'activo', 'fechaCreacion'],
       order: { fechaCreacion: 'DESC' },
     });
+  }
+
+  // NUEVOS MÉTODOS PARA RESET PASSWORD
+  
+  /**
+   * Actualiza el token de reset y su fecha de expiración para un usuario
+   * @param userId ID del usuario
+   * @param hashedCode Token hasheado
+   * @param expiry Fecha de expiración del token
+   */
+  async updateResetToken(userId: number, hashedCode: string, expiry: Date): Promise<void> {
+    const result = await this.userRepository.update(userId, {
+      resetToken: hashedCode,
+      resetTokenExpiry: expiry,
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
+  }
+
+  /**
+   * Actualiza la contraseña del usuario y limpia los tokens de reset
+   * @param userId ID del usuario
+   * @param hashedPassword Nueva contraseña hasheada
+   */
+  async updatePasswordAndClearToken(userId: number, hashedPassword: string): Promise<void> {
+    const result = await this.userRepository.update(userId, {
+      password: hashedPassword,
+     resetToken: undefined,
+     resetTokenExpiry: undefined,
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Usuario con ID ${userId} no encontrado`);
+    }
+  }
+
+  /**
+   * Limpia los tokens de reset de un usuario (útil para limpiar tokens expirados)
+   * @param userId ID del usuario
+   */
+  async clearResetToken(userId: number): Promise<void> {
+    await this.userRepository.update(userId, {
+      resetToken: undefined,
+      resetTokenExpiry: undefined,
+    });
+  }
+
+  /**
+   * Busca usuarios con tokens de reset expirados y los limpia
+   */
+  async cleanupExpiredTokens(): Promise<void> {
+    await this.userRepository.update(
+      {
+        
+         resetTokenExpiry: LessThan(new Date()), // ← Esta es la sintaxis correcta de TypeORM// Tokens expirados
+        
+      },
+      {
+        resetToken: undefined,
+      resetTokenExpiry: undefined,
+      }
+    );
   }
 }

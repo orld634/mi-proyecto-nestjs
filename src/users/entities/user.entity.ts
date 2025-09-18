@@ -37,6 +37,13 @@ export class User {
   @UpdateDateColumn()
   fechaActualizacion: Date;
 
+  @Column({ nullable: true })
+  resetToken?: string;
+
+  @Column({ nullable: true })
+  resetTokenExpiry?: Date;
+
+
   // Relación con Ventas (Un usuario puede tener muchas ventas)
   @OneToMany(() => Venta, (venta) => venta.usuario)
   ventas: Venta[];
