@@ -1,5 +1,3 @@
-
-
 // src/categoria/categoria.service.ts
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,9 +13,9 @@ export class CategoriaService {
     private readonly categoriaRepository: Repository<Categoria>,
   ) {}
 
+  // ==================== CREAR CATEGORÍA ====================
   async create(createCategoriaDto: CreateCategoriaDto): Promise<Categoria> {
     try {
-      // Verificar si ya existe una categoría con el mismo nombre
       const existingCategoria = await this.categoriaRepository.findOne({
         where: { nombre: createCategoriaDto.nombre }
       });
@@ -36,12 +34,14 @@ export class CategoriaService {
     }
   }
 
+  // ==================== LISTAR TODAS (SIN PRODUCTOS) ====================
   async findAll(): Promise<Categoria[]> {
     return await this.categoriaRepository.find({
       order: { nombre: 'ASC' }
     });
   }
 
+  // ==================== LISTAR ACTIVAS ====================
   async findAllActive(): Promise<Categoria[]> {
     return await this.categoriaRepository.find({
       where: { activo: true },
@@ -49,6 +49,34 @@ export class CategoriaService {
     });
   }
 
+  // ==================== NUEVO: LISTAR CON PRODUCTOS COMPLETOS ====================
+  async findAllWithProducts(): Promise<Categoria[]> {
+    return await this.categoriaRepository.find({
+      relations: ['productos'],
+      where: { activo: true },
+      order: { nombre: 'ASC' },
+      select: {
+        id_categoria: true,
+        nombre: true,
+        descripcion: true,
+        activo: true,
+        created_at: true,
+        updated_at: true,
+        productos: {
+          id_producto: true,
+          nombre: true,
+          marca: true,
+          precio_venta: true,
+          stock_actual: true,
+          imagen_url: true,
+          codigo_barras: true,
+          activo: true,
+        }
+      }
+    });
+  }
+
+  // ==================== BUSCAR UNA CATEGORÍA ====================
   async findOne(id: number): Promise<Categoria> {
     const categoria = await this.categoriaRepository.findOne({
       where: { id_categoria: id },
@@ -62,10 +90,10 @@ export class CategoriaService {
     return categoria;
   }
 
+  // ==================== ACTUALIZAR CATEGORÍA ====================
   async update(id: number, updateCategoriaDto: UpdateCategoriaDto): Promise<Categoria> {
     const categoria = await this.findOne(id);
 
-    // Verificar si el nuevo nombre ya existe (si se está cambiando)
     if (updateCategoriaDto.nombre && updateCategoriaDto.nombre !== categoria.nombre) {
       const existingCategoria = await this.categoriaRepository.findOne({
         where: { nombre: updateCategoriaDto.nombre }
@@ -80,6 +108,7 @@ export class CategoriaService {
     return await this.categoriaRepository.save(categoria);
   }
 
+  // ==================== ELIMINAR CATEGORÍA ====================
   async remove(id: number): Promise<void> {
     const categoria = await this.categoriaRepository.findOne({
       where: { id_categoria: id },
@@ -90,7 +119,6 @@ export class CategoriaService {
       throw new NotFoundException(`Categoría con ID ${id} no encontrada`);
     }
 
-    // Verificar si la categoría tiene productos asociados
     if (categoria.productos && categoria.productos.length > 0) {
       throw new BadRequestException(
         `No se puede eliminar la categoría porque tiene ${categoria.productos.length} producto(s) asociado(s)`
@@ -100,6 +128,7 @@ export class CategoriaService {
     await this.categoriaRepository.remove(categoria);
   }
 
+  // ==================== APROBAR / RECHAZAR ====================
   async aprobar(id: number): Promise<Categoria> {
     const categoria = await this.findOne(id);
     categoria.activo = true;
@@ -112,6 +141,7 @@ export class CategoriaService {
     return await this.categoriaRepository.save(categoria);
   }
 
+  // ==================== CON CONTEO DE PRODUCTOS (SQL) ====================
   async getCategoriasWithProductCount(): Promise<any[]> {
     return await this.categoriaRepository
       .createQueryBuilder('categoria')

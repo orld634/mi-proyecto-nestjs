@@ -1,8 +1,9 @@
+// src/users/users.service.ts
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository , LessThan } from 'typeorm';
+import { Repository, LessThan } from 'typeorm';
 import { User } from './entities/user.entity';
-import * as bcrypt from 'bcryptjs';
+import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -29,7 +30,7 @@ export class UsersService {
 
     // Hashear la contraseña
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+    const hashedPassword = await bcryptjs.hash(userData.password, saltRounds);
 
     // Crear el usuario
     const user = this.userRepository.create({
@@ -60,7 +61,7 @@ export class UsersService {
   }
 
   async validatePassword(plainPassword: string, hashedPassword: string) {
-    return await bcrypt.compare(plainPassword, hashedPassword);
+    return await bcryptjs.compare(plainPassword, hashedPassword);
   }
 
   async findAll(): Promise<User[]> {
@@ -97,8 +98,8 @@ export class UsersService {
   async updatePasswordAndClearToken(userId: number, hashedPassword: string): Promise<void> {
     const result = await this.userRepository.update(userId, {
       password: hashedPassword,
-     resetToken: undefined,
-     resetTokenExpiry: undefined,
+      resetToken: undefined,
+      resetTokenExpiry: undefined,
     });
 
     if (result.affected === 0) {
@@ -123,14 +124,26 @@ export class UsersService {
   async cleanupExpiredTokens(): Promise<void> {
     await this.userRepository.update(
       {
-        
-         resetTokenExpiry: LessThan(new Date()), // ← Esta es la sintaxis correcta de TypeORM// Tokens expirados
-        
+        resetTokenExpiry: LessThan(new Date()), // Tokens expirados
       },
       {
         resetToken: undefined,
-      resetTokenExpiry: undefined,
+        resetTokenExpiry: undefined,
       }
     );
+  }
+
+  /**
+   * Actualiza los datos de un usuario
+   * @param id ID del usuario
+   * @param updateData Datos a actualizar
+   */
+  async update(id: number, updateData: Partial<User>): Promise<void> {
+    await this.findById(id);
+    const result = await this.userRepository.update(id, updateData);
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
   }
 }

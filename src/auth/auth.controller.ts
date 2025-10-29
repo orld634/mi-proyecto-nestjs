@@ -47,6 +47,14 @@ export class AuthController {
   }
 
   @Public()
+  @Post('admin-login')
+  @HttpCode(HttpStatus.OK)
+  async adminLogin(@Body(ValidationPipe) loginDto: LoginDto) {
+    const result = await this.authService.adminLogin(loginDto);
+    return result;
+  }
+
+  @Public()
   @Post('forgot-password/send')
   @HttpCode(HttpStatus.OK)
   async sendResetCode(@Body(ValidationPipe) forgotPasswordDto: ForgotPasswordDto) {
@@ -74,7 +82,7 @@ export class AuthController {
     if (!req.user?.id) {
       throw new UnauthorizedException('User not authenticated');
     }
-   return await this.authService.getProfile(Number(req.user.id));
+    return await this.authService.getProfile(Number(req.user.id));
   }
 
   @UseGuards(JwtAuthGuard)
