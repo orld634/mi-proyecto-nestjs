@@ -33,7 +33,7 @@ export class DetalleCarritoService {
     });
 
     if (!detalleCarrito) {
-      throw new NotFoundException('Detalle de carrito con ID' + {id} + 'no encontrado');
+      throw new NotFoundException(`Detalle de carrito con ID ${id} no encontrado`);
     }
 
     return detalleCarrito;

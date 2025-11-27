@@ -25,7 +25,10 @@ export class CategoriaService {
       }
 
       const categoria = this.categoriaRepository.create(createCategoriaDto);
-      return await this.categoriaRepository.save(categoria);
+      const savedCategoria = await this.categoriaRepository.save(categoria);
+    console.log('Respuesta del backend en create:', savedCategoria); // Agrega aquí el console.log
+
+    return savedCategoria;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
