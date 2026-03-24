@@ -43,6 +43,13 @@ export class User {
   @Column({ nullable: true })
   resetTokenExpiry?: Date;
 
+  // ── Campos NUEVOS agregados para Google ────────────────────────────────
+  @Column({ nullable: true, unique: true })
+  googleId?: string;
+
+  @Column({ nullable: true })
+  avatar?: string;
+  // ──────────────────────────────────────────────────────────────────────
 
   // Relación con Ventas (Un usuario puede tener muchas ventas)
   @OneToMany(() => Venta, (venta) => venta.usuario)

@@ -2,6 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDa
 import { User } from '../../users/entities/user.entity';
 import { DetalleVenta } from '../../detalle-venta/entities/detalle-venta.entity';
 import { DevolucionVenta } from '../../devolucion-venta/entities/devolucion-venta.entity';
+import { MetodoPago } from '../../metodo_pago/entities/metodo-pago.entity';
+
 
 export enum EstadoVenta {
   COMPLETADA = 'completada',
@@ -59,4 +61,9 @@ export class Venta {
   // Relación con DevolucionVenta (Una venta puede tener múltiples devoluciones)
   @OneToMany(() => DevolucionVenta, (devolucion) => devolucion.venta)
   devoluciones: DevolucionVenta[];
+
+
+  @ManyToOne(() => MetodoPago, { nullable: false, onDelete: 'RESTRICT' })
+  @JoinColumn({ name: 'id_metodo_pago' })
+  metodoPago: MetodoPago;
 }

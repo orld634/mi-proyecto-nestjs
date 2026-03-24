@@ -1,5 +1,13 @@
 // src/auth/auth.service.ts
-import { Injectable, UnauthorizedException, ConflictException, HttpException, HttpStatus, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  OnModuleInit,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
@@ -11,12 +19,29 @@ import { JwtPayload } from './strategies/jwt.strategy';
 import * as bcrypt from 'bcryptjs';
 import * as nodemailer from 'nodemailer';
 
+// ── Agregados para soporte de Google ────────────────────────────────
+import { ConfigService } from '@nestjs/config';
+import { OAuth2Client } from 'google-auth-library';
+// ─────────────────────────────────────────────────────────────────────
+
 @Injectable()
 export class AuthService implements OnModuleInit {
+  // ── Agregado: cliente de Google ────────────────────────────────────
+  private googleClient: OAuth2Client;
+
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+    // ── Agregado: ConfigService para leer GOOGLE_CLIENT_ID ───────────
+    private readonly configService: ConfigService,
+  ) {
+    // ── Inicialización del cliente Google ────────────────────────────
+    const clientId = this.configService.get<string>('GOOGLE_CLIENT_ID');
+    if (!clientId) {
+      console.warn('⚠️ GOOGLE_CLIENT_ID no está configurado en .env');
+    }
+    this.googleClient = new OAuth2Client(clientId);
+  }
 
   async onModuleInit() {
     try {
@@ -280,7 +305,82 @@ export class AuthService implements OnModuleInit {
     return { success: true, message: 'Contraseña restablecida exitosamente. Puedes iniciar sesión ahora.' };
   }
 
-  // Método auxiliar para hashear contraseñas (si no está en UsersService)
+  // ── Método agregado para login con Google ───────────────────────────────
+  async googleLogin(googleIdToken: string) {
+    try {
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: googleIdToken,
+        audience: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) {
+        throw new UnauthorizedException('Token de Google inválido');
+      }
+
+      const {
+        email,
+        email_verified,
+        name,
+        given_name,
+        family_name,
+      } = payload;
+
+      if (!email || !email_verified) {
+        throw new BadRequestException('Email no proporcionado o no verificado por Google');
+      }
+
+      let user = await this.usersService.findByEmail(email);
+
+      if (!user) {
+        // Generamos una contraseña aleatoria fuerte para usuarios nuevos de Google
+        const randomPassword = await bcrypt.hash(
+          Math.random().toString(36).slice(-12) + Date.now(),
+          10,
+        );
+
+        user = await this.usersService.create({
+          email,
+          nombre: given_name || name?.split(' ')[0] || email.split('@')[0],
+          apellido: family_name || '',
+          password: randomPassword,
+          role: 'user',
+        });
+
+        console.log(`Usuario creado vía Google: ${email}`);
+      } else {
+        console.log(`Usuario existente logueado vía Google: ${email}`);
+      }
+
+      const jwtPayload: JwtPayload = {
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      };
+
+      const access_token = this.jwtService.sign(jwtPayload);
+
+      return {
+        mensaje: 'Login con Google exitoso',
+        usuario: {
+          id: user.id,
+          email: user.email,
+          nombre: user.nombre,
+          apellido: user.apellido,
+          role: user.role,
+        },
+        access_token,
+      };
+    } catch (error) {
+      console.error('Error en googleLogin:', error);
+      if (error instanceof UnauthorizedException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new UnauthorizedException('No se pudo autenticar con Google');
+    }
+  }
+
+  // Método auxiliar para hashear contraseñas
   private async hashPassword(password: string): Promise<string> {
     return await bcrypt.hash(password, 10);
   }

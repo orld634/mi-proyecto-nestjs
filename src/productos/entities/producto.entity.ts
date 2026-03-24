@@ -13,6 +13,10 @@ import { InventarioMovimiento } from '../../inventario-movimiento/entities/inven
 import { DetalleDevolucionVenta } from '../../detalle-devolucion-venta/entities/detalle-devolucion-venta.entity';
 import { DetalleDevolucionCompra } from '../../detalle-devolucion-compra/entities/detalle-devolucion-compra.entity';
 import { Categoria } from '../../categoria/entities/categoria.entity';
+import { Promocion } from '../../promociones/entities/promocione.entity';
+
+// dentro de la clase Producto, junto a los otros OneToMany:
+
 
 @Entity('productos')
 export class Producto {
@@ -101,4 +105,10 @@ export class Producto {
     eager: false
   })
   detallesDevolucionCompra: DetalleDevolucionCompra[];
+
+  @OneToMany(() => Promocion, (promocion) => promocion.producto, {
+  cascade: false,
+  eager: false
+})
+promociones: Promocion[];
 }

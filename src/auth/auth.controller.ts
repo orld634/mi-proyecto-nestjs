@@ -18,6 +18,8 @@ import { VerifyCodeDto } from '../auth/dto/verify-code.dto';
 import { ResetPasswordDto } from '../auth/dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
+import { GoogleLoginDto } from './dto/google-login.dto';
+
 
 // Interfaz para tipear correctamente las requests autenticadas
 interface AuthenticatedRequest extends Request {
@@ -74,6 +76,13 @@ export class AuthController {
   async resetPassword(@Body(ValidationPipe) resetPasswordDto: ResetPasswordDto) {
     return await this.authService.resetPassword(resetPasswordDto);
   }
+
+  @Public()
+@Post('google/login')
+@HttpCode(HttpStatus.OK)
+async googleLogin(@Body(ValidationPipe) dto: GoogleLoginDto) {
+  return await this.authService.googleLogin(dto.token);
+}
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')

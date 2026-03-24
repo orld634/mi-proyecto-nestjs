@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../src/auth/guards/jwt-auth.guard';
 import { ProveedoresModule } from './proveedores/proveedores.module';
 import { ProductosModule } from './productos/productos.module'; 
 import { VentaModule } from './venta/venta.module';
@@ -19,6 +19,8 @@ import { DetalleDevolucionVentaModule } from './detalle-devolucion-venta/detalle
 import { DevolucionCompraModule } from './devolucion-compra/devolucion-compra.module';
 import { DetalleDevolucionCompraModule } from './detalle-devolucion-compra/detalle-devolucion-compra.module';
 import { CategoriaModule } from './categoria/categoria.module';
+import { MetodoPagoModule } from './metodo_pago/metodo-pago.module';
+import { PromocionesModule } from './promociones/promociones.module';
 
 
 @Module({
@@ -28,7 +30,7 @@ import { CategoriaModule } from './categoria/categoria.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         type: 'mysql',
         host: configService.get<string>('DB_HOST') || 'localhost',
         port: 3306,
@@ -59,7 +61,12 @@ import { CategoriaModule } from './categoria/categoria.module';
     DetalleDevolucionVentaModule,
     DevolucionCompraModule,
     DetalleDevolucionCompraModule,
-    CategoriaModule
+    CategoriaModule,
+    PromocionesModule,
+    MetodoPagoModule,
+    
+    
+
     
   ],
   controllers: [],
