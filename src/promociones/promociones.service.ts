@@ -29,14 +29,19 @@ export class PromocionesService {
     return this.promocionRepository.save(promocion);
   }
 
+  // ← relations: ['producto'] agregado para traer imagen y datos del producto
   async findAll(): Promise<Promocion[]> {
     return this.promocionRepository.find({
+      relations: ['producto'],
       order: { fecha_inicio: 'DESC' },
     });
   }
 
   async findOne(id: number): Promise<Promocion> {
-    const promocion = await this.promocionRepository.findOneBy({ id_promocion: id });
+    const promocion = await this.promocionRepository.findOne({
+      where: { id_promocion: id },
+      relations: ['producto'],
+    });
 
     if (!promocion) {
       throw new NotFoundException(`Promoción con ID ${id} no encontrada`);
@@ -45,14 +50,16 @@ export class PromocionesService {
     return promocion;
   }
 
+  // ← relations: ['producto'] agregado también aquí
   async findActivas(): Promise<Promocion[]> {
     const hoy = new Date();
     return this.promocionRepository.find({
       where: {
         activo: true,
-        fecha_inicio: LessThanOrEqual(hoy),  // ✅ ya empezó
-        fecha_fin: MoreThanOrEqual(hoy),      // ✅ aún no termina
+        fecha_inicio: LessThanOrEqual(hoy),
+        fecha_fin: MoreThanOrEqual(hoy),
       },
+      relations: ['producto'],
       order: { fecha_fin: 'ASC' },
     });
   }
